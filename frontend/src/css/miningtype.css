@@ -1,0 +1,71 @@
+.miningtype_container{
+    
+   
+  
+   //border:2px solid red;
+    width:320px;
+    margin: auto;
+    margin-top: 2rem;
+
+    
+}
+.miningtype_container_type_1,.miningtype_container_type_2{
+  margin-left:0.5rem; 
+  padding: 8px 4px; 
+  
+  border-radius: 4px; 
+  cursor: pointer;
+ 
+  
+  background-color: white;
+  color:#007bff;
+  border:2px solid #007bff;
+}
+.miningtype_container_type_1:hover {
+    background-color: #0056b3; 
+    
+    color: #fff;
+  }
+  .miningtype_container_type_2:hover {
+    background-color: #0056b3; 
+    color: #fff;
+  }
+  .active{
+    color: #fff; 
+    background-color: #007bff;
+    border: 1px solid #ccc;
+  }
+  .date-picker {
+    display: flex;
+    border-radius: 5px;
+    padding: 10px;
+    max-width: 320px;
+    margin: 0 auto;
+    flex-direction: column;
+  }
+  
+  .date-picker label {
+    flex: 0 0 100%;
+    margin-bottom: 5px;
+    color: #007bff; /* Blue label color */
+  }
+  
+  .date-picker input[type="date"] {
+    flex: 0 0 calc(50% - 5px);
+    padding: 5px;
+    border: 1px solid #007bff; /* Light pink border */
+    border-radius: 4px;
+    margin-bottom: 10px;
+    color: #007bff; /* Pink date color */
+  }
+  
+  @media (max-width: 350px) { /* Media query max-width 320px */
+    .date-picker {
+      max-width: 100%; /* Set full width */
+    }
+  
+    .date-picker input[type="date"] {
+      flex: 0 0 100%;
+    }
+  }
+  

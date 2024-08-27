@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>File Uploaded</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        margin: 0;
+        padding: 0;
+        text-align: center;
+        background-color: #f4f4f4;
+      }
+
+      .upload-message {
+        max-width: 600px;
+        margin: 50px auto;
+        background-color: #fff;
+        padding: 20px;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+      }
+
+      .success-icon {
+        font-size: 48px;
+        color: #4caf50;
+      }
+
+      .message-text {
+        font-size: 24px;
+        color: #333;
+        margin-top: 20px;
+      }
+
+      .view-link {
+        display: inline-block;
+        margin-top: 20px;
+        padding: 10px 20px;
+        font-size: 16px;
+        text-decoration: none;
+        background-color: #333;
+        color: #fff;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        transition: background-color 0.3s ease;
+      }
+
+      .view-link:hover {
+        background-color: #555;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="upload-message">
+      <div class="success-icon">&#10004;</div>
+      <div class="message-text">
+        <p>File uploaded successfully!</p>
+      </div>
+      <a href="/project/board/1" class="view-link">Visit View Page</a>
+    </div>
+  </body>
+</html>

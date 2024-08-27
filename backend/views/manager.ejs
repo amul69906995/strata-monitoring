@@ -1,0 +1,304 @@
+<!-- <!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Manager Profile</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        margin: 0;
+        padding: 0;
+        text-align: center;
+        transition: background-color 0.5s ease;
+        background-color: grey;
+      }
+
+      .profile-container {
+        max-width: 80%;
+        margin: 50px auto;
+        background-color: #fff;
+        padding: 20px;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+      }
+
+      .header {
+        text-align: right;
+      }
+
+      .logout-button {
+        padding: 10px 20px;
+        font-size: 16px;
+        text-decoration: none;
+        background-color: #333;
+        color: #fff;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        transition: background-color 0.3s ease;
+      }
+
+      .logout-button:hover {
+        background-color: #555;
+      }
+
+      .profile-heading {
+        font-size: 24px;
+        color: #333;
+        margin-bottom: 20px;
+      }
+
+      .hello-user {
+        font-size: 18px;
+        color: #666;
+      }
+
+      .upload-form {
+        text-align: center;
+        margin-top: 20px;
+      }
+
+      .file-input {
+        margin-top: 10px;
+        display: block;
+        width: 100%;
+        padding: 10px;
+        font-size: 16px;
+      }
+
+      .upload-button {
+        margin-top: 10px;
+        margin-bottom: 20px;
+        padding: 10px 20px;
+        font-size: 16px;
+        background-color: #333;
+        color: #fff;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        transition: background-color 0.3s ease;
+      }
+
+      .upload-button:hover {
+        background-color: #555;
+      }
+
+      .route-button {
+        margin-top: 20px;
+        padding: 10px 20px;
+        font-size: 16px;
+        text-decoration: none;
+        background-color: #333;
+        color: #fff;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        transition: background-color 0.3s ease;
+      }
+
+      .route-button:hover {
+        background-color: #555;
+      }
+
+      /* Set background color based on time of day */
+      .day-time {
+        background-color: #fff;
+        color: #333;
+      }
+
+      .night-time {
+        background-color: #333;
+        color: #fff;
+      }
+    </style>
+  </head>
+  <body class="day-time">
+    <div class="profile-container">
+      <div class="header">
+        <a href="/project/users/profile/logout" class="logout-button">Logout</a>
+      </div>
+      <div class="profile-heading">
+        <h2>Manager Panel</h2>
+      </div>
+      <div class="hello-user">
+        <p>Hello, <%=user.name%></p>
+      </div>
+      <div class="upload-form">
+        <form action="/upload" method="post" enctype="multipart/form-data">
+          <label for="file">choose file</label>
+          <input type="file" name="file" />
+          <button type="submit" class="upload-button">Upload File</button>
+        </form>
+      </div>
+      <a href="other-page.html" class="route-button">Go to Other Page</a>
+    </div>
+
+    <script>
+      // Get the current hour to determine the time of day
+      var currentHour = new Date().getHours();
+
+      if (currentHour >= 18 || currentHour < 6) {
+        // Night time
+        document.body.classList.remove("day-time");
+        document.body.classList.add("night-time");
+      }
+    </script>
+  </body>
+</html>
+ -->
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Manager Profile</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        margin: 0;
+        padding: 0;
+        text-align: center;
+        transition: background-color 0.5s ease;
+        background-color: grey;
+      }
+
+      .profile-container {
+        max-width: 80%;
+        margin: 50px auto;
+        background-color: #fff;
+        padding: 20px;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+      }
+
+      .header {
+        text-align: right;
+      }
+
+      .logout-button {
+        padding: 10px 20px;
+        font-size: 16px;
+        text-decoration: none;
+        background-color: #333;
+        color: #fff;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        transition: background-color 0.3s ease;
+      }
+
+      .logout-button:hover {
+        background-color: #555;
+      }
+
+      .profile-heading {
+        font-size: 24px;
+        color: #333;
+        margin-bottom: 20px;
+      }
+
+      .hello-user {
+        font-size: 18px;
+        color: #666;
+      }
+
+      .upload-form {
+        text-align: center;
+        margin-top: 20px;
+      }
+
+      .file-input {
+        margin-top: 10px;
+        display: block;
+        width: 100%;
+        padding: 10px;
+        font-size: 16px;
+      }
+
+      .upload-button {
+        margin-top: 10px;
+        margin-bottom: 20px;
+        padding: 10px 20px;
+        font-size: 16px;
+        background-color: #333;
+        color: #fff;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        transition: background-color 0.3s ease;
+      }
+
+      .upload-button:hover {
+        background-color: #555;
+      }
+
+      .route-button {
+        margin-top: 20px;
+        padding: 10px 20px;
+        font-size: 16px;
+        text-decoration: none;
+        background-color: #333;
+        color: #fff;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        transition: background-color 0.3s ease;
+      }
+
+      .route-button:hover {
+        background-color: #555;
+      }
+
+      /* Set background color based on time of day */
+      .day-time {
+        background-color: #fff;
+        color: #333;
+      }
+
+      .night-time {
+        background-color: #333;
+        color: #fff;
+      }
+
+      .label {
+        display: block;
+        margin-top: 10px;
+        color: #333;
+      }
+    </style>
+  </head>
+  <body class="day-time">
+    <div class="profile-container">
+      <div class="header">
+        <a href="/project/users/profile/logout" class="logout-button">Logout</a>
+      </div>
+      <div class="profile-heading">
+        <h2>Manager Panel</h2>
+      </div>
+      <div class="hello-user">
+        <p>Hello, <%=user.name%></p>
+      </div>
+      <div class="upload-form">
+        <form action="/upload" method="post" enctype="multipart/form-data">
+          <label for="file">Choose File</label>
+          <input type="file" name="file" />
+          <label for="panel_number" class="label">Panel Number</label>
+          <input type="number" name="panel_number" />
+          <button type="submit" class="upload-button">Upload File</button>
+        </form>
+      </div>
+      <a href="other-page.html" class="route-button">Go to Other Page</a>
+    </div>
+
+    <script>
+      // Get the current hour to determine the time of day
+      var currentHour = new Date().getHours();
+
+      if (currentHour >= 18 || currentHour < 6) {
+        // Night time
+        document.body.classList.remove("day-time");
+        document.body.classList.add("night-time");
+      }
+    </script>
+  </body>
+</html>

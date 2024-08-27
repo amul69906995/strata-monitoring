@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html lang="en-US">
+  <head>
+    <meta charset="utf-8" />
+    <title>Canvas tutorial</title>
+    <!-- <link rel="stylesheet" href="style.css" /> -->
+    <style>
+      /* Style for next and previous buttons */
+      .button {
+        position: fixed;
+        bottom: 20px; /* Adjust as needed */
+        padding: 10px;
+        background-color: #007bff;
+        color: white;
+        cursor: pointer;
+      }
+
+      .update-button {
+        right: 20px;
+      }
+
+      .text-container2 {
+        position: fixed;
+        top: 100px;
+        left: 20px;
+        padding: 10px;
+        background-color: white;
+        font-weight: bold;
+        font-size: xx-large;
+      }
+    </style>
+  </head>
+  <body>
+    <canvas id="canvas"></canvas>
+    <div
+      id="coordinates"
+      style="position: fixed; top: 0; left: 0; padding: 10px; background: white"
+    ></div>
+
+    <!-- Next and Previous buttons -->
+    <a
+      href="http://localhost:3000/project/board/<%= requiredPillarData.pannel.pannelNumber %>/update?currentIndex=0"
+    >
+      <div class="button update-button" id="updateButton">Updated</div>
+    </a>
+
+    <div class="text-container2" id="textContainer2">
+      Panel Number-<%= requiredPillarData.pannel.pannelNumber %>
+    </div>
+
+    <!-- <script src="/style.js"></script> -->
+    <!-- Include style.js -->
+    <script>
+              var requiredPillarData = <%- JSON.stringify(requiredPillarData) %>;
+              console.log(requiredPillarData.pannel.Pillar);
+
+             const pillars=requiredPillarData.pannel.Pillar;
+
+
+
+             //for scaling
+
+             //max x->>
+             let maxX=pillars[0].coordinates[0]["x"];
+             console.log(maxX);
+
+             for(let i=0;i<pillars.length;i++)
+             {
+              for(let j=0;j<pillars[i].coordinates.length;j++)
+              {
+                if(pillars[i].coordinates[j]["x"]>=maxX)
+                {
+                  maxX=pillars[i].coordinates[j]["x"];
+                }
+              }
+
+             }
+
+             //min x-->>
+             let minX=pillars[0].coordinates[0]["x"];
+             console.log(minX);
+
+             for(let i=0;i<pillars.length;i++)
+             {
+              for(let j=0;j<pillars[i].coordinates.length;j++)
+              {
+                if(pillars[i].coordinates[j]["x"]<=minX)
+                {
+                  minX=pillars[i].coordinates[j]["x"];
+                }
+              }
+
+             }
+
+             //max y-->
+
+             let maxY=pillars[0].coordinates[0]["y"];
+             console.log(maxY);
+
+             for(let i=0;i<pillars.length;i++)
+             {
+              for(let j=0;j<pillars[i].coordinates.length;j++)
+              {
+                if(pillars[i].coordinates[j]["y"]>=maxY)
+                {
+                  maxY=pillars[i].coordinates[j]["y"];
+                }
+              }
+
+             }
+
+             //min y-->
+             let minY=pillars[0].coordinates[0]["y"];
+             console.log(minY);
+
+             for(let i=0;i<pillars.length;i++)
+             {
+              for(let j=0;j<pillars[i].coordinates.length;j++)
+              {
+                if(pillars[i].coordinates[j]["y"]<=minY)
+                {
+                  minY=pillars[i].coordinates[j]["y"];
+                }
+              }
+
+             }
+
+             ///------------------------>>>
+
+              const xDifference=maxX-minX;
+              const yDifference=maxY-minY;
+
+             console.log(maxX)
+             console.log(minX)
+             console.log(maxY)
+             console.log(minY)
+             console.log(xDifference);
+             console.log(yDifference);
+
+             //Scale factor
+             let scale;
+             if(xDifference>yDifference)
+             {
+              scale=xDifference;
+             }
+             else
+             {
+              scaleFactor=yDifference;
+             }
+
+             console.log(scale)
+
+
+
+
+
+
+
+
+
+        // First of all, we assign w and h to the width and height of the window
+        var w = window.innerWidth;
+        var h = window.innerHeight;
+
+        // Define the scaling factor
+        var scaleFactor = 100;
+
+        // made the variable for name final
+        let final;
+
+        // here we using if-else to set the final to be width or height
+        if (w > h) {
+          final = h;
+        } else {
+          final = w;
+        }
+
+        // Number of boxes and cell size
+        let numBoxes = 40;
+        var cellSize = final / numBoxes;
+
+        // Here we made grid lines
+        var canv = document.createElement("canvas");
+        canv.width = final;
+        canv.height = final;
+        document.body.appendChild(canv);
+        var ctx = canv.getContext("2d");
+
+        ctx.fillStyle = "grey";
+        ctx.fillRect(0, 0, w, h);
+
+        ctx.strokeStyle = "grey";
+
+        for (var c = 1; c < w / cellSize; c++) {
+          ctx.beginPath();
+          ctx.moveTo(c * cellSize, 0);
+          ctx.lineTo(c * cellSize, h);
+          ctx.stroke();
+        }
+
+        for (var r = 1; r < final / cellSize; r++) {
+          ctx.beginPath();
+          ctx.moveTo(0, r * cellSize);
+          ctx.lineTo(w, r * cellSize);
+          ctx.stroke();
+        }
+
+        // Here we calculate cell width
+        let cellwidth = scaleFactor / numBoxes;
+        console.log(cellSize);
+        console.log(cellwidth);
+
+        //calculation of final scale
+        console.log(`this is final ${final}`)
+        const finalScale=(final)/scale
+        console.log('this is final scale')
+        console.log(finalScale)
+
+
+        // Here we make the polygon using coordinates
+        function Drawer(canvas) {
+          var context = canvas.getContext("2d");
+          this.drawPolygon = function (points, status,config) {
+            if (points.length > 0) {
+              context.fillStyle = "red";
+              context.beginPath();
+              var point = points[0];
+              context.moveTo(point.x, point.y); // point 1
+              for (var i = 1; i < points.length; ++i) {
+                point = points[i];
+                context.lineTo(point.x, point.y); // point from 2 up to (points.length - 1)
+              }
+              context.closePath(); // go back to point 1
+
+
+              if(config==="pillar") {
+              if (status == "non extracted") {
+                context.fillStyle = "black";
+                context.fill();
+                context.strokeStyle = "red";
+                context.stroke(); // draw stroke line
+              } else if (status == "extracted") {
+                context.fillStyle = "grey";
+                context.fill();
+                context.strokeStyle = "red";
+                context.stroke(); // draw stroke line
+              }
+            }
+            if(config==="stook"){
+              context.fillStyle = "green";
+                context.fill();
+                context.strokeStyle = "yellow";
+                context.stroke();
+            }
+          };
+        }
+      }
+        // Function to create pillar using coordinates
+        function createPillar(points, status,config) {
+          let drawer = new Drawer(canv);
+          drawer.drawPolygon(points, status,config);
+        }
+
+        // Function to create pillars using object data
+        function createPillars(pillars,config) {
+          pillars.forEach((element) => {
+            let points = element.coordinates.map((coord) => ({
+              x: (coord.x)*finalScale ,
+              y: (coord.y)*finalScale,
+            }));
+            console.log(points);
+            createPillar(points, element.status,config);
+          });
+        }
+
+        createPillars(pillars,"pillar");
+
+
+
+
+
+        function createStook(pillars,config="stook"){
+          pillars.forEach(({stook}) => {
+            console.log(stook)
+
+            stook.forEach((element) => {
+            let points = element.coordinates.map((coord) => ({
+              x: (coord.x)*finalScale,
+              y: (coord.y)*finalScale,
+            }));
+            console.log(points)
+            createPillar(points, element.status,config);
+          });
+
+
+          })}
+        createStook(pillars,"stook")
+        // Get the coordinates div
+        var coordinatesDiv = document.getElementById("coordinates");
+
+        // Add mousemove event listener to the canvas
+        canv.addEventListener("mousemove", function (e) {
+          // Calculate mouse coordinates relative to the canvas
+          var mouseX =
+            (e.clientX - canv.getBoundingClientRect().left) *
+            (1/finalScale);
+          var mouseY =
+            (e.clientY - canv.getBoundingClientRect().top) *
+            (1/finalScale);
+
+          // Update the coordinates in the div
+          coordinatesDiv.innerHTML =
+            "X: " + mouseX.toFixed(2) + " units, Y: " + mouseY.toFixed(2) + " units";
+        });
+        // console.log(object);
+    </script>
+  </body>
+</html>

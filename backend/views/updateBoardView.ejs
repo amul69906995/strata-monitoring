@@ -1,0 +1,436 @@
+<!DOCTYPE html>
+<html lang="en-US">
+  <head>
+    <meta charset="utf-8" />
+    <title>Canvas tutorial</title>
+    <style>
+      /* Style for next and previous buttons */
+      .button {
+        position: fixed;
+        bottom: 20px; /* Adjust as needed */
+        padding: 10px;
+        background-color: #007bff;
+        color: white;
+        cursor: pointer;
+      }
+
+      .next-button {
+        right: 20px;
+      }
+
+      .prev-button {
+        left: 20px;
+      }
+
+      /* Style for text element */
+      .text-container {
+        position: fixed;
+        top: 50px;
+        left: 20px;
+        padding: 10px;
+        background-color: white;
+      }
+
+      .text-container2 {
+        position: fixed;
+        top: 100px;
+        left: 20px;
+        padding: 10px;
+        background-color: white;
+        font-weight: bold;
+        font-size: xx-large;
+      }
+    </style>
+  </head>
+  <body>
+    <!-- Canvas element -->
+    <canvas id="canvas"></canvas>
+
+    <!-- Div to show coordinates -->
+    <div
+      id="coordinates"
+      style="position: fixed; top: 0; left: 0; padding: 10px; background: white"
+    ></div>
+
+    <!-- Next and Previous buttons -->
+    <div class="button next-button" id="nextButton">Next</div>
+    <div class="button prev-button" id="prevButton">Previous</div>
+
+    <!-- Text container -->
+    <div class="text-container" id="textContainer">Your text here</div>
+    <div class="text-container2" id="textContainer2">Your text here</div>
+
+    <!-- JavaScript code for functionality (if needed) -->
+    <script>
+                                  var requiredPillarData = <%- JSON.stringify(requiredPillarData) %>;
+                                  var currentIndex = <%- JSON.stringify(currentIndex) %>;
+                                  console.log(requiredPillarData);
+                                  // Sort the array of objects based on the 'updatedAt' field in ascending order
+                                  requiredPillarData.sort((a, b) => new Date(a.updatedAt) - new Date(b.updatedAt));
+
+                                    console.log(requiredPillarData);
+
+                                    //function for changing time to indian time
+                         function convertToIndianTime(timestamp) {
+                       const options = {
+          year: 'numeric',
+          month: 'long',
+          day: 'numeric',
+          hour: '2-digit',
+          minute: '2-digit',
+          second: '2-digit',
+          hour12: false,
+          timeZone: 'Asia/Kolkata'
+        };
+
+        return new Date(timestamp).toLocaleString('en-IN', options);
+      }
+
+
+
+
+
+                                  let pannelNumber=requiredPillarData[currentIndex].pannel.pannelNumber;
+                                  console.log(pannelNumber);
+
+                                  let pillarTime=requiredPillarData[currentIndex].updatedAt;
+                                  console.log(pillarTime)
+
+                                        // Example usage:
+
+      const indianTime = convertToIndianTime(pillarTime);
+      console.log(indianTime);
+
+                                 let pillars=requiredPillarData[currentIndex].pannel.Pillar;
+                                 console.log(pillars)
+
+
+
+                                //  for scaling
+
+                                //  max x->>
+                                 let maxX=pillars[0].coordinates[0]["x"];
+                                 console.log(maxX);
+
+                                 for(let i=0;i<pillars.length;i++)
+                                 {
+                                  for(let j=0;j<pillars[i].coordinates.length;j++)
+                                  {
+                                    if(pillars[i].coordinates[j]["x"]>=maxX)
+                                    {
+                                      maxX=pillars[i].coordinates[j]["x"];
+                                    }
+                                  }
+
+                                 }
+
+                                 //min x-->>
+                                 let minX=pillars[0].coordinates[0]["x"];
+                                 console.log(minX);
+
+                                 for(let i=0;i<pillars.length;i++)
+                                 {
+                                  for(let j=0;j<pillars[i].coordinates.length;j++)
+                                  {
+                                    if(pillars[i].coordinates[j]["x"]<=minX)
+                                    {
+                                      minX=pillars[i].coordinates[j]["x"];
+                                    }
+                                  }
+
+                                 }
+
+                                 //max y-->
+
+                                 let maxY=pillars[0].coordinates[0]["y"];
+                                 console.log(maxY);
+
+                                 for(let i=0;i<pillars.length;i++)
+                                 {
+                                  for(let j=0;j<pillars[i].coordinates.length;j++)
+                                  {
+                                    if(pillars[i].coordinates[j]["y"]>=maxY)
+                                    {
+                                      maxY=pillars[i].coordinates[j]["y"];
+                                    }
+                                  }
+
+                                 }
+
+                                 //min y-->
+                                 let minY=pillars[0].coordinates[0]["y"];
+                                 console.log(minY);
+
+                                 for(let i=0;i<pillars.length;i++)
+                                 {
+                                  for(let j=0;j<pillars[i].coordinates.length;j++)
+                                  {
+                                    if(pillars[i].coordinates[j]["y"]<=minY)
+                                    {
+                                      minY=pillars[i].coordinates[j]["y"];
+                                    }
+                                  }
+
+                                 }
+
+                                 ///------------------------>>>
+
+                                  const xDifference=maxX-minX;
+                                  const yDifference=maxY-minY;
+
+                                 console.log(maxX)
+                                 console.log(minX)
+                                 console.log(maxY)
+                                 console.log(minY)
+                                 console.log(xDifference);
+                                 console.log(yDifference);
+
+                                 //Scale factor
+                                 let scale;
+                                 if(xDifference>yDifference)
+                                 {
+                                  scale=xDifference;
+                                 }
+                                 else
+                                 {
+                                  scaleFactor=yDifference;
+                                 }
+
+                                 console.log(scale)
+
+
+
+
+
+
+
+
+
+                            // First of all, we assign w and h to the width and height of the window
+                            var w = window.innerWidth;
+                            var h = window.innerHeight;
+
+                            // Define the scaling factor
+                            var scaleFactor = 100;
+
+                            // made the variable for name final
+                            let final;
+
+                            // here we using if-else to set the final to be width or height
+                            if (w > h) {
+                              final = h;
+                            } else {
+                              final = w;
+                            }
+
+                            // Number of boxes and cell size
+                            let numBoxes = 40;
+                            var cellSize = final / numBoxes;
+
+                            // Here we made grid lines
+                            var canv = document.createElement("canvas");
+                            canv.width = final;
+                            canv.height = final;
+                            document.body.appendChild(canv);
+                            var ctx = canv.getContext("2d");
+
+                            ctx.fillStyle = "grey";
+                            ctx.fillRect(0, 0, w, h);
+
+                            ctx.strokeStyle = "grey";
+
+                            for (var c = 1; c < w / cellSize; c++) {
+                              ctx.beginPath();
+                              ctx.moveTo(c * cellSize, 0);
+                              ctx.lineTo(c * cellSize, h);
+                              ctx.stroke();
+                            }
+
+                            for (var r = 1; r < final / cellSize; r++) {
+                              ctx.beginPath();
+                              ctx.moveTo(0, r * cellSize);
+                              ctx.lineTo(w, r * cellSize);
+                              ctx.stroke();
+                            }
+
+                            // Here we calculate cell width
+                            let cellwidth = scaleFactor / numBoxes;
+                            console.log(cellSize);
+                            console.log(cellwidth);
+
+                            //calculation of final scale
+                            console.log(`this is final ${final}`)
+                            const finalScale=(final)/scale
+                            console.log('this is final scale')
+                            console.log(finalScale)
+
+
+                            // Here we make the polygon using coordinates
+                            function Drawer(canvas) {
+                              var context = canvas.getContext("2d");
+                              this.drawPolygon = function (points, status,config) {
+                                if (points.length > 0) {
+                                  context.fillStyle = "red";
+                                  context.beginPath();
+                                  var point = points[0];
+                                  context.moveTo(point.x, point.y); // point 1
+                                  for (var i = 1; i < points.length; ++i) {
+                                    point = points[i];
+                                    context.lineTo(point.x, point.y); // point from 2 up to (points.length - 1)
+                                  }
+                                  context.closePath(); // go back to point 1
+
+
+                                  if(config==="pillar") {
+                                  if (status == "non extracted") {
+                                    context.fillStyle = "black";
+                                    context.fill();
+                                    context.strokeStyle = "red";
+                                    context.stroke(); // draw stroke line
+                                  } else if (status == "extracted") {
+                                    context.fillStyle = "grey";
+                                    context.fill();
+                                    context.strokeStyle = "red";
+                                    context.stroke(); // draw stroke line
+                                  }
+                                }
+                                if(config==="stook"){
+                                  context.fillStyle = "grey";
+                                    context.fill();
+                                    context.strokeStyle = "yellow";
+                                    context.stroke();
+                                }
+                              };
+                            }
+                            }
+                            // Function to create pillar using coordinates
+                            function createPillar(points, status,config) {
+                              let drawer = new Drawer(canv);
+                              drawer.drawPolygon(points, status,config);
+                            }
+
+                            // Function to create pillars using object data
+                            function createPillars(pillars,config) {
+                              pillars.forEach((element) => {
+                                let points = element.coordinates.map((coord) => ({
+                                  x: (coord.x)*finalScale ,
+                                  y: (coord.y)*finalScale,
+                                }));
+                                console.log(points);
+                                createPillar(points, element.status,config);
+                              });
+                            }
+
+                            createPillars(pillars,"pillar");
+                            function createStook(pillars,config="stook"){
+                              pillars.forEach(({stook}) => {
+                                console.log(stook)
+
+                                stook.forEach((element) => {
+                                let points = element.coordinates.map((coord) => ({
+                                  x: (coord.x)*finalScale,
+                                  y: (coord.y)*finalScale,
+                                }));
+                                console.log(points)
+                                createPillar(points, element.status,config);
+                              });
+
+
+                              })}
+                            createStook(pillars,"stook")
+                            // Get the coordinates div
+                            var coordinatesDiv = document.getElementById("coordinates");
+
+                            // Add mousemove event listener to the canvas
+                            canv.addEventListener("mousemove", function (e) {
+                              // Calculate mouse coordinates relative to the canvas
+                              var mouseX =
+                                (e.clientX - canv.getBoundingClientRect().left) *
+                                (1/finalScale);
+                              var mouseY =
+                                (e.clientY - canv.getBoundingClientRect().top) *
+                                (1/finalScale);
+
+                              // Update the coordinates in the div
+                              coordinatesDiv.innerHTML =
+                                "X: " + mouseX.toFixed(2) + " units, Y: " + mouseY.toFixed(2) + " units";
+                            });
+                            // console.log(object);
+
+                                // Select the text container element
+                          const textContainer = document.getElementById('textContainer');
+
+                      // Function to update the text content
+                      function updateText(newText) {
+                        textContainer.textContent = newText;
+                      }
+
+                      // Example usage: update text dynamically
+                      updateText(indianTime);
+                                      // Select the text container element
+                                      const textContainer2 = document.getElementById('textContainer2');
+
+                // Function to update the text content
+                function updateText2(newText) {
+                  textContainer2.textContent = `Panel Number-${newText}`;
+                }
+
+                // Example usage: update text dynamically
+                updateText2(pannelNumber);
+
+
+
+                   //  references to the next and previous buttons
+              const nextButton = document.getElementById('nextButton');
+              const prevButton = document.getElementById('prevButton');
+
+              // function to update url in broswer without relodingthe page
+              function updateCurrentIndex(newValue) {
+              // Get the current URL
+              let url = new URL(window.location.href);
+
+              // Set the new value for currentIndex
+              url.searchParams.set('currentIndex', newValue);
+
+              // Update the URL in the browser's history without reloading the page
+              window.history.pushState({}, '', url);
+              window.location.reload();
+            }
+
+
+              //  click event listener for the next button
+              nextButton.addEventListener('click', function() {
+                if(currentIndex<requiredPillarData.length-1)
+                {
+                  currentIndex++;
+                  updateCurrentIndex(currentIndex)
+                }
+                else
+                {
+                  nextButton.remove();
+                }
+
+
+                console.log('Next button clicked');
+
+              });
+
+              //  click event listener for the previous button
+              prevButton.addEventListener('click', function() {
+                if(currentIndex>0)
+                {
+                  currentIndex--;
+                  updateCurrentIndex(currentIndex)
+                }
+                else
+                {
+                  previousButton.remove();
+                }
+
+
+                console.log('Next button clicked');
+                console.log('Previous button clicked');
+              });
+    </script>
+  </body>
+</html>

@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>User Profile</title>
+    <link rel="stylesheet" href="/profile.css" />
+  </head>
+  <body class="day-time">
+    <div class="profile-container">
+      <div class="greeting-line">
+        <p id="greeting"></p>
+      </div>
+      <div class="name">
+        <p>Hello, <%= user.name%>!</p>
+      </div>
+      <a href="/project/board" class="button">Go to Another Page</a>
+    </div>
+
+    <a href="/project/users/profile/logout" class="sign-out">Sign Out</a>
+
+    <script>
+      // Get the current hour to determine the time of day
+      var currentHour = new Date().getHours();
+      var greetingElement = document.getElementById("greeting");
+
+      if (currentHour >= 5 && currentHour < 12) {
+        // Morning
+        greetingElement.innerText = "Good Morning";
+      } else if (currentHour >= 12 && currentHour < 18) {
+        // Afternoon
+        greetingElement.innerText = "Good Afternoon";
+      } else {
+        // Evening/Night
+        greetingElement.innerText = "Good Evening";
+        // Change background color for night time
+        document.body.classList.remove("day-time");
+        document.body.classList.add("night-time");
+      }
+    </script>
+  </body>
+</html>

@@ -1,0 +1,21 @@
+.intrument{
+    margin-left:0.5rem; 
+    margin-bottom:0.5rem;
+    padding: 8px 4px; 
+    border-radius: 4px; 
+    cursor: pointer;
+    background-color: white;
+    color:#007bff;
+    border:2px solid #007bff;
+   
+}
+.intrument:hover{
+    background-color: #0056b3; 
+    
+    color: #fff;
+}
+.active{
+    color: #fff; 
+    background-color: #007bff;
+    border: 1px solid #ccc;
+  }

@@ -1,0 +1,129 @@
+ [
+    {
+      "instrumentName": "Convergence rate indicator:",
+      "instrumentCode": "CRI",
+      "location": {"x": 10,"y": 4},
+      "miningType": "conventional",
+      "miningCode": "conv",
+      "unit": "mm/day",
+      "lowerSafeLimit": 1.5,
+      "upperSafeLimit": 5.5,
+      "readings": [
+        {
+          "date": "2017-01-01",
+          "readings": [
+            {"time": "08:00", "value": 2},
+            {"time": "12:00", "value": 3},
+            {"time": "16:00", "value": 3.5}
+          ]
+        },
+        {
+          "date": "2017-01-02",
+          "readings": [
+            {"time": "09:00", "value": 3},
+            {"time": "13:00", "value": 4},
+            {"time": "17:00", "value": 4.5},
+            {"time": "21:00", "value": 5}
+          ]
+        },
+        {
+          "date": "2017-01-03",
+          "readings": [
+            {"time": "10:00", "value": 2.5},
+            {"time": "14:00", "value": 3.5},
+            {"time": "18:00", "value": 4},
+            {"time": "22:00", "value": 5.5},
+            {"time": "02:00", "value": 5}
+          ]
+        }
+      ]
+    },
+    {
+      "instrumentName": "Load Cells",
+      "instrumentCode": "LC",
+      "location": {"x": 12,"y": 8},
+      "miningType": "mechanical",
+      "miningCode": "mech",
+      "unit": "kN",
+      "lowerSafeLimit": 8,
+      "upperSafeLimit": 16,
+      "readings": [
+        {
+          "date": "2017-01-01",
+          "readings": [
+            {"time": "08:00", "value": 10},
+            {"time": "12:00", "value": 12},
+            {"time": "16:00", "value": 11}
+          ]
+        },
+        {
+          "date": "2017-01-02",
+          "readings": [
+            {"time": "09:00", "value": 11},
+            {"time": "13:00", "value": 13},
+            {"time": "17:00", "value": 14},
+            {"time": "21:00", "value": 15}
+          ]
+        }
+      ]
+    },
+    {
+      "instrumentName": "Stress Cells",
+      "instrumentCode": "SC",
+      "location": {"x": 8,"y": 6},
+      "miningType": "conventional",
+      "miningCode": "conv",
+      "unit": "MPa",
+      "lowerSafeLimit": 4,
+      "upperSafeLimit": 9,
+      "readings": [
+        {
+          "date": "2017-01-01",
+          "readings": [
+            {"time": "08:00", "value": 5},
+            {"time": "12:00", "value": 4.6},
+            {"time": "16:00", "value": 5.5}
+          ]
+        },
+        {
+          "date": "2017-01-02",
+          "readings": [
+            {"time": "09:00", "value": 6},
+            {"time": "13:00", "value": 10.5},
+            {"time": "17:00", "value": 10},
+            {"time": "21:00", "value": 11}
+          ]
+        }
+      ]
+    },
+    {
+      "instrumentName": "Inclinometers",
+      "instrumentCode": "INC",
+      "location": {"x": 14,"y": 10},
+      "miningType": "mechanical",
+      "miningCode": "mech",
+      "unit": "degrees",
+      "lowerSafeLimit": 0.5,
+      "upperSafeLimit": 2.5,
+      "readings": [
+        {
+          "date": "2017-01-01",
+          "readings": [
+            {"time": "08:00", "value": {"x_tilt":1,"y_tilt":1.1}},
+            {"time": "12:00", "value":{"x_tilt":1.35,"y_tilt":1.2}},
+            {"time": "16:00", "value": {"x_tilt":1.5,"y_tilt":1.1}}
+          ]
+        },
+        {
+          "date": "2017-01-02",
+          "readings": [
+            {"time": "09:00", "value": {"x_tilt":2,"y_tilt":0.1}},
+            {"time": "13:00", "value": {"x_tilt":1.45,"y_tilt":0.8}},
+            {"time": "17:00", "value": {"x_tilt":0.49,"y_tilt":1.9}},
+            {"time": "21:00", "value": {"x_tilt":0.57,"y_tilt":1.7}}
+          ]
+        }
+      ]
+    }
+  ]
+  
