@@ -4,7 +4,7 @@ const app = express();
 require('dotenv').config()
 const Instrument = require('./model/instrument')
 const Value = require('./model/value')
-const getInstrumentConversion = require('./utils/conversion')
+const getInstrumentConversion = require('./utils/conversion');
 //mongoose connection
 const mongoose = require('mongoose');
 async function main() {
