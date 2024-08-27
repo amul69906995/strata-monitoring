@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
-import './View.css'; // Import the CSS file
+import './view.css'; // Import the CSS file
 import {Link} from 'react-router-dom'
 const View = () => {
     const [instruments, setInstrument] = useState([]);

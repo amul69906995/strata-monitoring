@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import './Search.css'; // Import the CSS file
+import './search.css'; // Import the CSS file
 import { useNavigate } from 'react-router-dom';
 
 const Search = () => {
