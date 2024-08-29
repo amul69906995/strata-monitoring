@@ -1,13 +1,12 @@
 import React, { useState } from 'react';
 import './add.css'; // Assuming you have a CSS file for styling
-
+import axios from 'axios'
 const Add = () => {
   const [formData, setFormData] = useState({
     instrumentId: '',
-    xCoordinate: '',
-    yCoordinate: '',
+    value:''
   });
-
+const [loading,setLoading]=useState(false)
   const [errors, setErrors] = useState({});
 
   const handleChange = (e) => {
@@ -28,11 +27,19 @@ const Add = () => {
     return Object.keys(newErrors).length === 0;
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async(e) => {
     e.preventDefault();
     if (validateForm()) {
-      // Form submission logic here
-      console.log('Form submitted successfully:', formData);
+      try {
+        setLoading(true)
+        const {data}=await axios.post(`${import.meta.env.VITE_BACKEND_URL}/${formData.instrumentId}`,{value:formData.value})
+        console.log(data)
+      } catch (error) {
+        console.log(error)
+      }
+      finally{
+        setLoading(false)
+      }
     }
   };
 
@@ -53,32 +60,18 @@ const Add = () => {
         </div>
 
         <div className="form-group">
-          <label htmlFor="xCoordinate">X Coordinate</label>
+          <label htmlFor="value">Value</label>
           <input
             type="number"
-            id="xCoordinate"
-            name="xCoordinate"
-            placeholder="Enter X Coordinate"
-            value={formData.xCoordinate}
+            id="value"
+            name="value"
+            placeholder="Enter Value"
+            value={formData.value}
             onChange={handleChange}
           />
-          {errors.xCoordinate && <span className="error">{errors.xCoordinate}</span>}
+          {errors.value && <span className="error">{errors.value}</span>}
         </div>
-
-        <div className="form-group">
-          <label htmlFor="yCoordinate">Y Coordinate</label>
-          <input
-            type="number"
-            id="yCoordinate"
-            name="yCoordinate"
-            placeholder="Enter Y Coordinate"
-            value={formData.yCoordinate}
-            onChange={handleChange}
-          />
-          {errors.yCoordinate && <span className="error">{errors.yCoordinate}</span>}
-        </div>
-
-        <button type="submit">Add Instrument</button>
+        <button type="submit" disabled={loading}>Add Data</button>
       </form>
     </>
   );

@@ -75,6 +75,7 @@ app.post('/:instrumentId', async (req, res) => {
   try {
     const { instrumentId } = req.params;
     const reqInstrument = await Instrument.find({ instrumentId });
+
     console.log(reqInstrument)
     const { value } = req.body;
     const newValue = new Value({ value, time: Date.now(), owner: reqInstrument[0]._id });
