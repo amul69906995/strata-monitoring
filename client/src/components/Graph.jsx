@@ -35,7 +35,7 @@ const Graph = () => {
   }, [])
   useEffect(() => {
     fetchInstrument();
-  }, [])
+  }, [instrumentId])
   const fetchInstrument = async () => {
     try {
       const { data } = await axios.get(`${import.meta.env.VITE_BACKEND_URL}/${instrumentId}`);
