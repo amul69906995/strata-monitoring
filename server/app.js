@@ -4,7 +4,11 @@ const app = express();
 require('dotenv').config()
 const Instrument = require('./model/instrument')
 const Value = require('./model/value')
+const Panel = require('./model/panel')
+const multer = require('multer')
 const getInstrumentConversion = require('./utils/conversion');
+const upload = multer({ dest: 'uploads/' })
+const { processAFile } = require('./utils/processFile')
 //mongoose connection
 const mongoose = require('mongoose');
 async function main() {
@@ -71,18 +75,22 @@ app.get('/:instrumentId', async (req, res) => {
 })
 
 //add a instrument value
-app.post('/:instrumentId', async (req, res) => {
+app.post('/:instrumentId', async (req, res, next) => {
   try {
     const { instrumentId } = req.params;
     const reqInstrument = await Instrument.find({ instrumentId });
 
-    console.log(reqInstrument)
+    console.log("required instrument", reqInstrument);
+    if (reqInstrument.length == 0) {
+      throw new Error('instrument not found', 500)
+    }
     const { value } = req.body;
     const newValue = new Value({ value, time: Date.now(), owner: reqInstrument[0]._id });
     await newValue.save();
     res.json(newValue)
   } catch (e) {
-    console.log(e)
+    next(e);
+
   }
 })
 //get all instrument in a panel number
@@ -95,6 +103,81 @@ app.get('/instruments/:panelNumber', async (req, res) => {
     console.log(err)
   }
 })
+//save panel data
+app.post('/upload/panel', upload.single('file'), async (req, res, next) => {
+  try {
+    console.log(req.file)
+    const panelData = await processAFile(req.file.path);
+    const newPanel = new Panel(panelData)
+    await newPanel.save()
+    res.json({ "message": "file uploaded successfully" })
+  } catch (err) {
+    next(err)
+  }
+})
+//get all panels
+app.get('/all/panel', async (req, res, next) => {
+  try {
+    const panels = await Panel.aggregate([
+       { $sort: { panelNumber: 1, date: 1 } },
+      {
+        $group: {
+          _id: "$panelNumber",
+          description: { $first: "$notes" },
+          snapshots: { $sum: 1 },
+          dates: { $push: "$date" }
+        }
+      },
+      {
+        $addFields: {
+          panelNumber: "$_id"
+        }
+      },
+      { $sort: { panelNumber: 1 } }
+    ]);
+    //console.log("all panels...", panels)
+    const panelWithInstruments = await Promise.all(
+      panels.map(async (panel) => {
+        const instruments = await Instrument.find(
+          { panelNumber: panel.panelNumber },
+          {
+            _id: 0,
+            instrumentId: 1,
+            instrumentName: 1,
+            description: 1,
+            xCoordinate: 1,
+            yCoordinate: 1
+          }
+        );
+
+        return {
+          ...panel,
+          instruments
+        };
+      })
+    );
+    //console.log("panel with instruments", panelWithInstruments)
+    res.json(panelWithInstruments);
+  } catch (e) {
+    next(e);
+  }
+});
+
+app.use('*', (req, res) => {
+  throw new Error('route not found', 404)
+})
+
+app.use((err, req, res, next) => {
+  const { message = "something went wrong/default message to debug u have to dig dipper", statusCode = 500 } = err
+  console.log("**********error**************")
+  console.log("**********error**************")
+  console.log(message, statusCode)
+  console.log("**********error**************")
+  console.log("**********error**************")
+  res.status(statusCode).json({ message })
+})
+
+
 //listening or starting the server
 app.listen(process.env.PORT || 6000, () => {
   console.log(`starting the server successfully on port`)

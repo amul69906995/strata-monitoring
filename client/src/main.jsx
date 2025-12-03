@@ -6,6 +6,9 @@ import {
   RouterProvider, 
 } from "react-router-dom";
 import Graph from './components/Graph';
+import UploadPanel from './components/UploadPanel';
+import PanelList from './components/panelList';
+import PanelView from './components/PanelView';
 const router=createBrowserRouter([
   {
     path:'/',
@@ -14,6 +17,18 @@ const router=createBrowserRouter([
   {
     path:'/:instrumentId/graph',
     element:<Graph/>
+  },
+  {
+   path:'/upload/panel',
+   element:<UploadPanel/>
+  },
+  {
+   path:'/all/panel',
+   element:<PanelList/>
+  },
+  {
+   path:'/panelview/:panelId',
+   element:<PanelView/>
   }
 
 ])

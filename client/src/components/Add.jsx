@@ -1,12 +1,14 @@
-import React, { useState } from 'react';
-import './add.css'; // Assuming you have a CSS file for styling
+import { useState } from 'react';
+import './add.css';
+import { toast } from 'react-toastify';
+
 import axios from 'axios'
 const Add = () => {
   const [formData, setFormData] = useState({
     instrumentId: '',
-    value:''
+    value: ''
   });
-const [loading,setLoading]=useState(false)
+  const [loading, setLoading] = useState(false)
   const [errors, setErrors] = useState({});
 
   const handleChange = (e) => {
@@ -27,17 +29,19 @@ const [loading,setLoading]=useState(false)
     return Object.keys(newErrors).length === 0;
   };
 
-  const handleSubmit = async(e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     if (validateForm()) {
       try {
         setLoading(true)
-        const {data}=await axios.post(`${import.meta.env.VITE_BACKEND_URL}/${formData.instrumentId}`,{value:formData.value})
-        console.log(data)
+        const { data } = await axios.post(`${import.meta.env.VITE_BACKEND_URL}/${formData.instrumentId}`, { value: formData.value })
+        console.log("adding data in an instrument", data)
+         toast.success("data added")
       } catch (error) {
-        console.log(error)
+        console.log(error.response.data.message)
+        toast.error(error.response.data.message)
       }
-      finally{
+      finally {
         setLoading(false)
       }
     }

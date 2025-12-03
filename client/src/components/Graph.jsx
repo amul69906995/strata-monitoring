@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { LineChart, XAxis, YAxis, Legend, Tooltip, Line, CartesianGrid } from 'recharts';
 import { useParams } from 'react-router-dom';
 import axios from 'axios'
