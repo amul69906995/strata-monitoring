@@ -1,0 +1,56 @@
+.panel-view-container {
+  padding: 20px;
+  max-width: 800px;
+  margin: 0 auto;
+  font-family: Arial, sans-serif;
+  color: #333;
+}
+
+.panel-title {
+  font-size: 24px;
+  margin-bottom: 8px;
+  color: #1a3c7b;
+}
+
+.panel-time {
+  text-align: right;
+  font-size: 14px;
+  color: #666;
+  margin-bottom: 12px;
+}
+
+.panel-snapshot-date {
+  font-size: 15px;
+  margin-bottom: 18px;
+  color: #444;
+}
+
+.panel-nav {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 20px;
+}
+
+.panel-nav button {
+  padding: 6px 12px;
+  border: none;
+  background-color: #1a3c7b;
+  color: white;
+  font-size: 14px;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.panel-nav button:disabled {
+  background-color: #aaa;
+  cursor: not-allowed;
+}
+
+.panel-loading,
+.panel-empty {
+  text-align: center;
+  margin-top: 40px;
+  font-size: 18px;
+  color: #888;
+}

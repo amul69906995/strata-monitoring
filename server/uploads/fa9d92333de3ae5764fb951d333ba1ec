@@ -1,0 +1,14 @@
+{
+  "panelNumber": 1,
+  "date": "2025-12-01T08:00:00Z",
+  "panelStatus": "working",
+  "pillars": [
+    { "pillarNumber": 1, "coordinates": [ { "x": 5, "y": 5 }, { "x": 7, "y": 5 }, { "x": 7, "y": 8 }, { "x": 5, "y": 8 } ], "status": "intact" },
+    { "pillarNumber": 2, "coordinates": [ { "x": 8, "y": 5 }, { "x": 10, "y": 5 }, { "x": 10, "y": 8 }, { "x": 8, "y": 8 } ], "status": "intact" },
+    { "pillarNumber": 3, "coordinates": [ { "x": 11, "y": 5 }, { "x": 13, "y": 5 }, { "x": 13, "y": 8 }, { "x": 11, "y": 8 } ], "status": "intact" },
+    { "pillarNumber": 4, "coordinates": [ { "x": 14, "y": 5 }, { "x": 16, "y": 5 }, { "x": 16, "y": 8 }, { "x": 14, "y": 8 } ], "status": "intact" },
+    { "pillarNumber": 5, "coordinates": [ { "x": 17, "y": 5 }, { "x": 19, "y": 5 }, { "x": 19, "y": 8 }, { "x": 17, "y": 8 } ], "status": "intact" }
+  ],
+  "instrumentIds": ["15", "16", "17", "18"],
+  "notes": "Initial layout. No extraction yet."
+}

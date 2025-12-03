@@ -119,7 +119,7 @@ app.post('/upload/panel', upload.single('file'), async (req, res, next) => {
 app.get('/all/panel', async (req, res, next) => {
   try {
     const panels = await Panel.aggregate([
-       { $sort: { panelNumber: 1, date: 1 } },
+      { $sort: { panelNumber: 1, date: 1 } },
       {
         $group: {
           _id: "$panelNumber",
@@ -162,7 +162,25 @@ app.get('/all/panel', async (req, res, next) => {
     next(e);
   }
 });
+app.get('/panel/data/:panelNumber', async (req, res, next) => {
+  try {
+    const panelNumber = parseInt(req.params.panelNumber);
 
+    if (!panelNumber) {
+      return res.status(400).json({ message: "Invalid panel number" });
+    }
+
+    const panelSnapshots = await Panel.find({ panelNumber })
+      .sort({ date: 1 });
+    if (panelSnapshots.lenght == 0) {
+      return res.status(400).json({ message: " panel not found" });
+    }
+    console.log("panelsnapshot.......", panelSnapshots)
+    res.json(panelSnapshots);
+  } catch (err) {
+    next(err);
+  }
+})
 app.use('*', (req, res) => {
   throw new Error('route not found', 404)
 })
