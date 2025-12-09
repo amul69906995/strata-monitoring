@@ -1,11 +1,12 @@
 import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import axios from 'axios';
-import PanelSnapshot from './PanelSnapshot';
 import './PanelView.css';
+import PanelSnapshot from './Panelsnapshot';
 
 const PanelView = () => {
   const [panels, setPanels] = useState([]);
+  const [allInstruments, setAllInstruments] = useState([])
   const [loading, setLoading] = useState(true);
   const [current, setCurrent] = useState(0);
   const { panelId } = useParams();
@@ -15,8 +16,11 @@ const PanelView = () => {
       try {
         setLoading(true);
         const url = `${import.meta.env.VITE_BACKEND_URL}/panel/data/${panelId}`;
-        const { data } = await axios.get(url);
-        setPanels(data);
+        const url_instrument = `${import.meta.env.VITE_BACKEND_URL}/instruments/${panelId}`
+        const responsePanels = await axios.get(url);
+        const responseInstrument = await axios.get(url_instrument);
+        setAllInstruments(responseInstrument.data)
+        setPanels(responsePanels.data);
       } catch (err) {
         console.error("Error fetching panel data:", err);
       } finally {
@@ -47,22 +51,17 @@ const PanelView = () => {
 
   return (
     <div className="panel-view-container">
-      <div className="panel-time">
-        Current Time: <strong>{new Date().toLocaleString('en-GB')}</strong>
-      </div>
-
       <h2 className="panel-title">Panel #{panelId} Snapshot Viewer</h2>
       <p className="panel-snapshot-date">
         Snapshot Taken At: <strong>{formatSnapshotDate(currentSnapshot.date)}</strong>
       </p>
-
       <div className="panel-nav">
         <button onClick={goPrev} disabled={current === 0}>⬅ Prev</button>
         <span>Snapshot {current + 1} of {panels.length}</span>
         <button onClick={goNext} disabled={current === panels.length - 1}>Next ➡</button>
       </div>
 
-      <PanelSnapshot snapshot={currentSnapshot} index={current} />
+      <PanelSnapshot snapshot={currentSnapshot} instrunmentsData={allInstruments} index={current} />
     </div>
   );
 };

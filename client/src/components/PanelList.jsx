@@ -59,7 +59,7 @@ const PanelList = () => {
           {panels.map((panel, index) => (
             <div className="panel-card block-style" key={index}>
               <Link to={`/panelview/${panel.panelNumber}`} className="panel-link">
-                <div className="panel-title">Panel #{panel.panelNumber}</div>
+                <div className="panel-title">Panel view #{panel.panelNumber}</div>
               </Link>
 
               <div className="panel-section">

@@ -7,7 +7,7 @@ import {
 } from "react-router-dom";
 import Graph from './components/Graph';
 import UploadPanel from './components/UploadPanel';
-import PanelList from './components/panelList';
+import PanelList from './components/PanelList';
 import PanelView from './components/PanelView';
 const router=createBrowserRouter([
   {
