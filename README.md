@@ -39,18 +39,17 @@ Log time-based monitoring values to track strata changes.
 
 ### 3️⃣ View Instruments  
 See all instruments in a single searchable interface.
+Use the homepage search bar for quick access to any instrument.
 
 ![View Instruments](./assets/instrument_view.png)
 
 ---
+### 4️⃣  Instrument Graph Visualization  
+View plotted readings for any instrument within a panel.
 
-### 4️⃣ Search Instrument by ID  
-Use the homepage search bar for quick access to any instrument.
-
-*(No image provided — will display if available)*
+![Instrument Data Graph](./assets/instrument_data_graph.png)
 
 ---
-
 ### 5️⃣ Upload Panel JSON  
 Upload panel geometry and status data.
 
@@ -62,13 +61,6 @@ Upload panel geometry and status data.
 Browse all panels, their metadata, and statuses.
 
 ![Panel List View](./assets/panel_details.png)
-
----
-
-### 7️⃣ Instrument Graph Visualization  
-View plotted readings for any instrument within a panel.
-
-![Instrument Data Graph](./assets/instrument_data_graph.png)
 
 ---
 
