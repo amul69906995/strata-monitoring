@@ -3,7 +3,16 @@ import axios from 'axios';
 import { ToastContainer, toast } from 'react-toastify';
 import { Link } from 'react-router-dom';
 
+
 const UploadPanel = () => {
+    const user = JSON.parse(localStorage.getItem("user"));
+    const allowedEmails = ["abbyynic@gmail.com"];
+
+    if (!allowedEmails.includes(user?.email)) {
+        return <h2>Access Denied</h2>;
+    }
+
+
     const [file, setFile] = useState(null);
     const [uploading, setUploading] = useState(false);
 
@@ -24,14 +33,18 @@ const UploadPanel = () => {
 
     const handleUpload = async (e) => {
         e.preventDefault();
-        console.log("handle upload fired")
+
         if (!file) return toast.error('Please select a JSON file.');
-       
+
         setUploading(true);
+
         try {
             const formData = new FormData();
             formData.append('file', file);
+            formData.append('email', user.email); // 🔥 moved here
+
             const url = `${import.meta.env.VITE_BACKEND_URL}/upload/panel`;
+
             await axios.post(url, formData, {
                 headers: {
                     'Content-Type': 'multipart/form-data',
@@ -40,10 +53,10 @@ const UploadPanel = () => {
 
             toast.success('Panel uploaded successfully.');
 
-            // reset
             setFile(null);
             const input = document.getElementById('panel-json-input');
             if (input) input.value = '';
+
         } catch (err) {
             console.log('Error uploading file', err);
             toast.error('Error uploading file.');
@@ -54,21 +67,21 @@ const UploadPanel = () => {
 
     return (
         <div style={{ padding: 16, maxWidth: 800 }}>
-         <Link
-        to="/"
-        style={{
-          display: 'inline-block',
-          marginBottom: '20px',
-          backgroundColor: '#1d4ed8',
-          color: '#fff',
-          padding: '8px 16px',
-          borderRadius: '5px',
-          textDecoration: 'none',
-          fontWeight: 500
-        }}
-      >
-        ← Back to Home
-      </Link>
+            <Link
+                to="/"
+                style={{
+                    display: 'inline-block',
+                    marginBottom: '20px',
+                    backgroundColor: '#1d4ed8',
+                    color: '#fff',
+                    padding: '8px 16px',
+                    borderRadius: '5px',
+                    textDecoration: 'none',
+                    fontWeight: 500
+                }}
+            >
+                ← Back to Home
+            </Link>
             <h1>Upload a panel</h1>
 
             <ToastContainer position="bottom-right" />
@@ -96,7 +109,7 @@ const UploadPanel = () => {
                 <div style={{ display: 'flex', gap: 12 }}>
                     <button
                         type="submit"
-                        disabled={ uploading}
+                        disabled={uploading}
                         style={{
                             backgroundColor: '#007bff',
                             color: '#fff',
@@ -107,8 +120,8 @@ const UploadPanel = () => {
                             fontSize: '16px',
                         }}
                         onMouseOver={(e) =>
-                            (e.target.style.backgroundColor =
-                                uploading ? '#007bff' : '#0056b3')
+                        (e.target.style.backgroundColor =
+                            uploading ? '#007bff' : '#0056b3')
                         }
                         onMouseOut={(e) =>
                             (e.target.style.backgroundColor = '#007bff')

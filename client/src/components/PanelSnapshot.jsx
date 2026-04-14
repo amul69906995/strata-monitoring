@@ -8,6 +8,63 @@ const PanelSnapshot = ({ snapshot, instrunmentsData, index }) => {
   // cursor state: { inside: bool, x: number, y: number }
   const [cursor, setCursor] = useState({ inside: false, x: 0, y: 0 });
 
+  //new codes
+  const drawPillars = (ctx, pillars) => {
+  if (!pillars || pillars.length === 0) return;
+
+  let maxX = -Infinity, minX = Infinity;
+  let maxY = -Infinity, minY = Infinity;
+
+  pillars.forEach(p => {
+    p.coordinates.forEach(coord => {
+      maxX = Math.max(maxX, coord.x);
+      minX = Math.min(minX, coord.x);
+      maxY = Math.max(maxY, coord.y);
+      minY = Math.min(minY, coord.y);
+    });
+  });
+
+  const width = maxX - minX;
+  const height = maxY - minY;
+
+  const scale = Math.max(width, height);
+  const finalScale = Math.min(950, 520) / scale;
+
+  const drawPolygon = (points, status) => {
+    ctx.beginPath();
+    ctx.moveTo(points[0].x, points[0].y);
+
+    for (let i = 1; i < points.length; i++) {
+      ctx.lineTo(points[i].x, points[i].y);
+    }
+
+    ctx.closePath();
+
+    ctx.fillStyle = status === "extracted" ? "grey" : "black";
+    ctx.fill();
+
+    ctx.strokeStyle = "red";
+    ctx.stroke();
+  };
+
+  pillars.forEach(p => {
+    const points = p.coordinates.map(c => ({
+      x: (c.x - minX) * finalScale,
+      y: (c.y - minY) * finalScale,
+    }));
+
+    drawPolygon(points, p.status);
+  });
+};
+
+
+
+
+
+
+
+  ///
+
   useEffect(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
@@ -32,6 +89,8 @@ const PanelSnapshot = ({ snapshot, instrunmentsData, index }) => {
     ctx.strokeStyle = "#333";
     ctx.lineWidth = 2;
     ctx.strokeRect(1, 1, gridWidth - 2, gridHeight - 2);
+
+    drawPillars(ctx, snapshot?.pillars);
 
     // no cleanup necessary here; event listeners handled separately
   }, [gridWidth, gridHeight, snapshot, instrunmentsData, index]);

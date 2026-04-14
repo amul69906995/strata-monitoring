@@ -105,13 +105,26 @@ app.get('/instruments/:panelNumber', async (req, res) => {
 })
 //save panel data
 app.post('/upload/panel', upload.single('file'), async (req, res, next) => {
+  console.log('Received request to upload panel data');
+  const email = req.body.email;
+
+  console.log(req.body)
+
+  const allowedEmails = ["abbyynic@gmail.com"];
+
+  if (!allowedEmails.includes(email)) {
+    return res.status(403).json({ message: "Not authorized" });
+  }
   try {
-    console.log(req.file)
+    console.log('Received file:', req.file);
     const panelData = await processAFile(req.file.path);
+    console.log('Processed panel data:', panelData);
     const newPanel = new Panel(panelData)
     await newPanel.save()
+    console.log('Panel saved successfully');
     res.json({ "message": "file uploaded successfully" })
   } catch (err) {
+    console.log('Error in upload:', err);
     next(err)
   }
 })
