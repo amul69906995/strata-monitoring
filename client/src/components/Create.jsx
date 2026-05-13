@@ -1,5 +1,6 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import './create.css'; // Assuming you have a CSS file for styling
+import {  toast } from 'react-toastify';
 import axios from 'axios'
 const Create = () => {
   const [formData, setFormData] = useState({
@@ -39,8 +40,11 @@ const Create = () => {
      try {
       const {data}=await axios.post(`${import.meta.env.VITE_BACKEND_URL}`,{...formData});
       console.log(data);
+      toast.success('instrument created.');
      } catch (e) {
       console.log(e)
+      toast.error('Error creating instrument.');
+
      }
     }
   };

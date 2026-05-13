@@ -27,7 +27,7 @@ app.use(express.json())
 
 //endpoint
 //get all the instrument
-app.get('/', async (req, res) => {
+app.get('/', async (req, res,next) => {
   // get all instrument based on filter
   try {
     const allInstruments = await Instrument.find({})
@@ -35,11 +35,12 @@ app.get('/', async (req, res) => {
   }
   catch (e) {
     console.log(e)
+    next(e)
   }
 
 })
 //create a new instrument
-app.post('/', async (req, res) => {
+app.post('/', async (req, res,next) => {
   try {
     const { instrumentName, instrumentId, panelNumber, maxValue, minValue, description, xCoordinate, yCoordinate } = req.body;
     const fullFormUnit = getInstrumentConversion(instrumentName);
@@ -50,10 +51,11 @@ app.post('/', async (req, res) => {
   }
   catch (err) {
     console.log(err)
+    next(err)
   }
 })
 //get all data about a instrument
-app.get('/:instrumentId', async (req, res) => {
+app.get('/:instrumentId', async (req, res,next) => {
   //get data based on instrument id
   try {
     const { instrumentId } = req.params;
@@ -71,6 +73,7 @@ app.get('/:instrumentId', async (req, res) => {
     res.json(sortedData)
   } catch (e) {
     console.log(e)
+    next(e)
   }
 })
 
@@ -101,20 +104,15 @@ app.get('/instruments/:panelNumber', async (req, res) => {
   }
   catch (err) {
     console.log(err)
+    next(err)
   }
 })
 //save panel data
 app.post('/upload/panel', upload.single('file'), async (req, res, next) => {
   console.log('Received request to upload panel data');
-  const email = req.body.email;
 
   console.log(req.body)
 
-  const allowedEmails = ["abbyynic@gmail.com"];
-
-  if (!allowedEmails.includes(email)) {
-    return res.status(403).json({ message: "Not authorized" });
-  }
   try {
     console.log('Received file:', req.file);
     const panelData = await processAFile(req.file.path);

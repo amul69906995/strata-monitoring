@@ -5,15 +5,7 @@ import { Link } from 'react-router-dom';
 
 
 const UploadPanel = () => {
-    const user = JSON.parse(localStorage.getItem("user"));
-    const allowedEmails = ["abbyynic@gmail.com"];
-
-    if (!allowedEmails.includes(user?.email)) {
-        return <h2>Access Denied</h2>;
-    }
-
-
-    const [file, setFile] = useState(null);
+     const [file, setFile] = useState(null);
     const [uploading, setUploading] = useState(false);
 
     const handleFileChange = (e) => {
@@ -41,7 +33,6 @@ const UploadPanel = () => {
         try {
             const formData = new FormData();
             formData.append('file', file);
-            formData.append('email', user.email); // 🔥 moved here
 
             const url = `${import.meta.env.VITE_BACKEND_URL}/upload/panel`;
 

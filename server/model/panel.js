@@ -10,7 +10,7 @@ const pillarSchema = new mongoose.Schema({
   ],
   status: {
     type: String,
-    enum: ['intact', 'extracted', 'failed'],
+    enum: ['intact', 'extracted', 'failed','active'],
     default: 'intact'
   }
 }, { _id: false });
@@ -20,7 +20,7 @@ const panelSchema = new mongoose.Schema({
   date: { type: Date, default: Date.now },
   panelStatus: {
     type: String,
-    enum: ['working', 'completed', 'inactive'],
+    enum: ['working', 'completed', 'inactive' , 'active'],
     default: 'working'
   },
   pillars: [pillarSchema],

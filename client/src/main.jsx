@@ -9,7 +9,6 @@ import Graph from './components/Graph';
 import UploadPanel from './components/UploadPanel';
 import PanelList from './components/PanelList';
 import PanelView from './components/PanelView';
-import { GoogleOAuthProvider } from '@react-oauth/google';
 
 const router=createBrowserRouter([
   {
@@ -36,10 +35,6 @@ const router=createBrowserRouter([
 ])
 createRoot(document.getElementById('root')).render(
   <StrictMode>
-
-    <GoogleOAuthProvider clientId="260206504151-pthinpafj3dg0vsgt8uqibekig5s1r77.apps.googleusercontent.com">
       <RouterProvider router={router} />
-    </GoogleOAuthProvider>
-
   </StrictMode>,
 )

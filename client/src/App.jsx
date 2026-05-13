@@ -5,19 +5,14 @@ import View from './components/View'
 import Search from './components/Search'
 import { Link } from 'react-router-dom'
 import { ToastContainer } from 'react-toastify';
-import Login from './components/Login'
 
 const App = () => {
-  const user = JSON.parse(localStorage.getItem("user"));
-  const allowedEmails = ["abbyynic@gmail.com"];
-  const isAdmin = allowedEmails.includes(user?.email);
   const [isOpenCreate, setIsOpenCreate] = useState(false)
   const [isOpenAdd, setIsOpenAdd] = useState(false)
   const [isViewOpen, setIsViewOpen] = useState(true)
 
   return (
     <>
-      {!user && <Login />}
       <ToastContainer
         position="bottom-right"
         autoClose={5000}
@@ -84,23 +79,20 @@ const App = () => {
       >
         View
       </button>
-      {isAdmin && (
-        <Link
-          to="/upload/panel"
-          style={{
-            display: 'inline-block',
-            backgroundColor: '#007bff',
-            color: '#fff',
-            padding: '10px 20px',
-            borderRadius: '4px',
-            marginLeft: '10px',
-            textDecoration: 'none',
-          }}
-        >
-          Upload panel data
-        </Link>
-      )}
-
+      <Link
+        to="/upload/panel"
+        style={{
+          display: 'inline-block',
+          backgroundColor: '#007bff',
+          color: '#fff',
+          padding: '10px 20px',
+          borderRadius: '4px',
+          marginLeft: '10px',
+          textDecoration: 'none',
+        }}
+      >
+        Upload panel data
+      </Link>
       <Link
         to="/all/panel"
         style={{

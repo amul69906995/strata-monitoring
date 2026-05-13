@@ -1,181 +1,906 @@
-import  { useRef, useEffect, useState } from "react";
+import { useRef, useEffect, useState, useCallback } from "react";
 
-const PanelSnapshot = ({ snapshot, instrunmentsData, index }) => {
-  const gridWidth = 950;
-  const gridHeight = 520;
-  const canvasRef = useRef(null);
+// ─────────────────────────────────────────────
+// CONSTANTS
+// ─────────────────────────────────────────────
 
-  // cursor state: { inside: bool, x: number, y: number }
-  const [cursor, setCursor] = useState({ inside: false, x: 0, y: 0 });
+const DPR = window.devicePixelRatio || 1;
 
-  //new codes
-  const drawPillars = (ctx, pillars) => {
-  if (!pillars || pillars.length === 0) return;
+const PADDING_RATIO = 0.08;
 
-  let maxX = -Infinity, minX = Infinity;
-  let maxY = -Infinity, minY = Infinity;
+const INSTRUMENT_RADIUS = 14;
 
-  pillars.forEach(p => {
-    p.coordinates.forEach(coord => {
-      maxX = Math.max(maxX, coord.x);
-      minX = Math.min(minX, coord.x);
-      maxY = Math.max(maxY, coord.y);
-      minY = Math.min(minY, coord.y);
+const COLOR = {
+  bg: "#f0f4fa",
+
+  grid: "rgba(100,120,160,0.08)",
+  gridMajor: "rgba(100,120,160,0.18)",
+  gridLabel: "rgba(80,100,140,0.5)",
+
+  pillarFill: "rgba(20,40,90,0.82)",
+  pillarFillExtract: "rgba(120,130,150,0.55)",
+
+  pillarStroke: "#1a3c7b",
+  pillarStrokeExtract: "#8090aa",
+
+  instrFill: "#1976d2",
+  instrStroke: "#ffffff",
+  instrLabel: "#ffffff",
+
+  tooltipBg: "#ffffff",
+  tooltipBorder: "#d0daea",
+  tooltipTitle: "#1976d2",
+  tooltipMuted: "#666",
+
+  crosshair: "rgba(25,118,210,0.55)",
+};
+
+// ─────────────────────────────────────────────
+// TRANSFORM
+// ─────────────────────────────────────────────
+
+function computeTransform(
+  pillars,
+  instruments,
+  vpWidth,
+  vpHeight
+) {
+  let minX = Infinity;
+  let minY = Infinity;
+
+  let maxX = -Infinity;
+  let maxY = -Infinity;
+
+  // pillars
+  pillars?.forEach((pillar) => {
+    pillar.coordinates?.forEach((c) => {
+      minX = Math.min(minX, c.x);
+      minY = Math.min(minY, c.y);
+
+      maxX = Math.max(maxX, c.x);
+      maxY = Math.max(maxY, c.y);
     });
   });
 
-  const width = maxX - minX;
-  const height = maxY - minY;
+  // instruments
+  instruments?.forEach((inst) => {
+    const x = Number(inst.xCoordinate);
+    const y = Number(inst.yCoordinate);
 
-  const scale = Math.max(width, height);
-  const finalScale = Math.min(950, 520) / scale;
+    if (!isNaN(x) && !isNaN(y)) {
+      minX = Math.min(minX, x);
+      minY = Math.min(minY, y);
 
-  const drawPolygon = (points, status) => {
-    ctx.beginPath();
-    ctx.moveTo(points[0].x, points[0].y);
-
-    for (let i = 1; i < points.length; i++) {
-      ctx.lineTo(points[i].x, points[i].y);
+      maxX = Math.max(maxX, x);
+      maxY = Math.max(maxY, y);
     }
-
-    ctx.closePath();
-
-    ctx.fillStyle = status === "extracted" ? "grey" : "black";
-    ctx.fill();
-
-    ctx.strokeStyle = "red";
-    ctx.stroke();
-  };
-
-  pillars.forEach(p => {
-    const points = p.coordinates.map(c => ({
-      x: (c.x - minX) * finalScale,
-      y: (c.y - minY) * finalScale,
-    }));
-
-    drawPolygon(points, p.status);
   });
-};
 
+  if (
+    !isFinite(minX) ||
+    !isFinite(minY) ||
+    !isFinite(maxX) ||
+    !isFinite(maxY)
+  ) {
+    return null;
+  }
 
+  const worldWidth = maxX - minX;
+  const worldHeight = maxY - minY;
 
+  // dynamic padding
+  const paddingX =
+    worldWidth * PADDING_RATIO;
 
+  const paddingY =
+    worldHeight * PADDING_RATIO;
 
+  minX -= paddingX;
+  maxX += paddingX;
 
+  minY -= paddingY;
+  maxY += paddingY;
 
-  ///
+  const paddedWidth = maxX - minX;
+  const paddedHeight = maxY - minY;
 
+  // preserve aspect ratio
+  const scale = Math.min(
+    vpWidth / paddedWidth,
+    vpHeight / paddedHeight
+  );
+
+  // center
+  const offsetX =
+    (vpWidth - paddedWidth * scale) /
+    2;
+
+  const offsetY =
+    (vpHeight -
+      paddedHeight * scale) /
+    2;
+
+  return {
+    minX,
+    minY,
+    maxX,
+    maxY,
+
+    scale,
+
+    offsetX,
+    offsetY,
+
+    vpWidth,
+    vpHeight,
+  };
+}
+
+function worldToCanvas(x, y, t) {
+  return {
+    x:
+      (x - t.minX) * t.scale +
+      t.offsetX,
+
+    y:
+      t.vpHeight -
+      ((y - t.minY) * t.scale +
+        t.offsetY),
+  };
+}
+
+// ─────────────────────────────────────────────
+// GRID
+// ─────────────────────────────────────────────
+
+function drawGrid(ctx, t) {
+  const worldWidth =
+    t.maxX - t.minX;
+
+  const worldHeight =
+    t.maxY - t.minY;
+
+  const range = Math.max(
+    worldWidth,
+    worldHeight
+  );
+
+  const rawStep = range / 10;
+
+  const mag = Math.pow(
+    10,
+    Math.floor(Math.log10(rawStep))
+  );
+
+  const step =
+    Math.ceil(rawStep / mag) * mag;
+
+  ctx.font = "10px monospace";
+
+  // vertical
+  for (
+    let wx =
+      Math.floor(t.minX / step) * step;
+    wx <= t.maxX + step;
+    wx += step
+  ) {
+    const p = worldToCanvas(
+      wx,
+      0,
+      t
+    );
+
+    const major =
+      Math.round(wx / step) % 5 === 0;
+
+    ctx.strokeStyle = major
+      ? COLOR.gridMajor
+      : COLOR.grid;
+
+    ctx.lineWidth = major ? 1 : 0.5;
+
+    ctx.beginPath();
+    ctx.moveTo(p.x, 0);
+    ctx.lineTo(p.x, t.vpHeight);
+    ctx.stroke();
+
+    if (major) {
+      ctx.fillStyle =
+        COLOR.gridLabel;
+
+      ctx.textAlign = "center";
+
+      ctx.fillText(
+        wx.toFixed(0),
+        p.x,
+        t.vpHeight - 6
+      );
+    }
+  }
+
+  // horizontal
+  for (
+    let wy =
+      Math.floor(t.minY / step) * step;
+    wy <= t.maxY + step;
+    wy += step
+  ) {
+    const p = worldToCanvas(
+      0,
+      wy,
+      t
+    );
+
+    const major =
+      Math.round(wy / step) % 5 === 0;
+
+    ctx.strokeStyle = major
+      ? COLOR.gridMajor
+      : COLOR.grid;
+
+    ctx.lineWidth = major ? 1 : 0.5;
+
+    ctx.beginPath();
+    ctx.moveTo(0, p.y);
+    ctx.lineTo(t.vpWidth, p.y);
+    ctx.stroke();
+
+    if (major) {
+      ctx.fillStyle =
+        COLOR.gridLabel;
+
+      ctx.textAlign = "left";
+
+      ctx.fillText(
+        wy.toFixed(0),
+        4,
+        p.y - 4
+      );
+    }
+  }
+}
+
+// ─────────────────────────────────────────────
+// COMPONENT
+// ─────────────────────────────────────────────
+
+const PanelSnapshot = ({
+  snapshot,
+  instrunmentsData,
+}) => {
+  const canvasRef = useRef(null);
+
+  const containerRef =
+    useRef(null);
+
+  const hitRef = useRef([]);
+
+  const [canvasSize, setCanvasSize] =
+    useState({
+      width: 0,
+      height: 0,
+    });
+
+  const [
+    hoveredInstrument,
+    setHoveredInstrument,
+  ] = useState(null);
+
+  const [tooltipPos, setTooltipPos] =
+    useState({
+      x: 0,
+      y: 0,
+    });
+
+  // resize observer
+  useEffect(() => {
+    if (!containerRef.current) return;
+
+    const observer =
+      new ResizeObserver(([entry]) => {
+        const { width, height } =
+          entry.contentRect;
+
+        setCanvasSize({
+          width,
+          height,
+        });
+      });
+
+    observer.observe(
+      containerRef.current
+    );
+
+    return () => observer.disconnect();
+  }, []);
+
+  // draw
   useEffect(() => {
     const canvas = canvasRef.current;
-    if (!canvas) return;
-    const dpr = window.devicePixelRatio || 1;
 
-    // set CSS size
-    canvas.style.width = `${gridWidth}px`;
-    canvas.style.height = `${gridHeight}px`;
+    if (
+      !canvas ||
+      canvasSize.width === 0 ||
+      canvasSize.height === 0
+    ) {
+      return;
+    }
 
-    // set backing store size for crispness
-    canvas.width = Math.round(gridWidth * dpr);
-    canvas.height = Math.round(gridHeight * dpr);
+    canvas.width =
+      canvasSize.width * DPR;
 
-    const ctx = canvas.getContext("2d");
-    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    canvas.height =
+      canvasSize.height * DPR;
 
-    // clear and draw
-    ctx.clearRect(0, 0, gridWidth, gridHeight);
-    ctx.fillStyle = "#ffffff";
-    ctx.fillRect(0, 0, gridWidth, gridHeight);
+    canvas.style.width = "100%";
+    canvas.style.height = "100%";
 
-    ctx.strokeStyle = "#333";
-    ctx.lineWidth = 2;
-    ctx.strokeRect(1, 1, gridWidth - 2, gridHeight - 2);
+    const ctx =
+      canvas.getContext("2d");
 
-    drawPillars(ctx, snapshot?.pillars);
+    ctx.setTransform(
+      DPR,
+      0,
+      0,
+      DPR,
+      0,
+      0
+    );
 
-    // no cleanup necessary here; event listeners handled separately
-  }, [gridWidth, gridHeight, snapshot, instrunmentsData, index]);
+    ctx.clearRect(
+      0,
+      0,
+      canvasSize.width,
+      canvasSize.height
+    );
 
+    const vw = canvasSize.width;
+    const vh = canvasSize.height;
+
+    // background
+    ctx.fillStyle = COLOR.bg;
+
+    ctx.fillRect(0, 0, vw, vh);
+
+    const pillars =
+      snapshot?.pillars || [];
+
+    const instruments =
+      instrunmentsData || [];
+
+    const transform =
+      computeTransform(
+        pillars,
+        instruments,
+        vw,
+        vh
+      );
+
+    if (!transform) {
+      ctx.fillStyle = "#999";
+
+      ctx.font = "16px Arial";
+
+      ctx.textAlign = "center";
+
+      ctx.fillText(
+        "No data available",
+        vw / 2,
+        vh / 2
+      );
+
+      return;
+    }
+
+    // grid
+    drawGrid(ctx, transform);
+
+    // pillars
+    pillars.forEach((pillar) => {
+      const pts =
+        pillar.coordinates?.map((c) =>
+          worldToCanvas(
+            c.x,
+            c.y,
+            transform
+          )
+        ) || [];
+
+      if (pts.length === 0) return;
+
+      const extracted =
+        pillar.status === "extracted";
+
+      ctx.beginPath();
+
+      ctx.moveTo(
+        pts[0].x,
+        pts[0].y
+      );
+
+      pts.slice(1).forEach((p) => {
+        ctx.lineTo(p.x, p.y);
+      });
+
+      ctx.closePath();
+
+      ctx.fillStyle = extracted
+        ? COLOR.pillarFillExtract
+        : COLOR.pillarFill;
+
+      ctx.fill();
+
+      ctx.strokeStyle = extracted
+        ? COLOR.pillarStrokeExtract
+        : COLOR.pillarStroke;
+
+      ctx.lineWidth = 1.5;
+
+      ctx.stroke();
+    });
+
+    // instruments
+    hitRef.current = [];
+
+    instruments.forEach((inst) => {
+      const x = Number(
+        inst.xCoordinate
+      );
+
+      const y = Number(
+        inst.yCoordinate
+      );
+
+      if (isNaN(x) || isNaN(y)) return;
+
+      const pos =
+        worldToCanvas(
+          x,
+          y,
+          transform
+        );
+
+      // glow
+      ctx.beginPath();
+
+      ctx.arc(
+        pos.x,
+        pos.y,
+        INSTRUMENT_RADIUS + 4,
+        0,
+        Math.PI * 2
+      );
+
+      ctx.fillStyle =
+        "rgba(25,118,210,0.12)";
+
+      ctx.fill();
+
+      // circle
+      ctx.beginPath();
+
+      ctx.arc(
+        pos.x,
+        pos.y,
+        INSTRUMENT_RADIUS,
+        0,
+        Math.PI * 2
+      );
+
+      ctx.fillStyle =
+        COLOR.instrFill;
+
+      ctx.fill();
+
+      ctx.strokeStyle =
+        COLOR.instrStroke;
+
+      ctx.lineWidth = 2;
+
+      ctx.stroke();
+
+      // crosshair
+      ctx.strokeStyle =
+        COLOR.crosshair;
+
+      ctx.lineWidth = 1;
+
+      ctx.setLineDash([3, 3]);
+
+      ctx.beginPath();
+
+      ctx.moveTo(
+        pos.x -
+          INSTRUMENT_RADIUS -
+          8,
+        pos.y
+      );
+
+      ctx.lineTo(
+        pos.x +
+          INSTRUMENT_RADIUS +
+          8,
+        pos.y
+      );
+
+      ctx.stroke();
+
+      ctx.beginPath();
+
+      ctx.moveTo(
+        pos.x,
+        pos.y -
+          INSTRUMENT_RADIUS -
+          8
+      );
+
+      ctx.lineTo(
+        pos.x,
+        pos.y +
+          INSTRUMENT_RADIUS +
+          8
+      );
+
+      ctx.stroke();
+
+      ctx.setLineDash([]);
+
+      // label
+      ctx.fillStyle =
+        COLOR.instrLabel;
+
+      ctx.font =
+        "bold 9px Arial";
+
+      ctx.textAlign = "center";
+
+      ctx.textBaseline = "middle";
+
+      ctx.fillText(
+        (
+          inst.instrumentName || "I"
+        ).substring(0, 3),
+        pos.x,
+        pos.y
+      );
+
+      // hit area
+      hitRef.current.push({
+        x: pos.x,
+        y: pos.y,
+        r: INSTRUMENT_RADIUS,
+        instrument: inst,
+      });
+    });
+  }, [
+    snapshot,
+    instrunmentsData,
+    canvasSize,
+  ]);
+
+  // hit detection
+  const getHit = useCallback(
+    (clientX, clientY) => {
+      const canvas =
+        canvasRef.current;
+
+      if (!canvas) return null;
+
+      const rect =
+        canvas.getBoundingClientRect();
+
+      const mx =
+        clientX - rect.left;
+
+      const my =
+        clientY - rect.top;
+
+      const hit =
+        hitRef.current.find(
+          (h) =>
+            Math.hypot(
+              mx - h.x,
+              my - h.y
+            ) <=
+            h.r + 4
+        );
+
+      return hit
+        ? {
+            inst: hit.instrument,
+            x: mx,
+            y: my,
+          }
+        : {
+            inst: null,
+            x: mx,
+            y: my,
+          };
+    },
+    []
+  );
+
+  // events
   useEffect(() => {
-    const canvas = canvasRef.current;
+    const canvas =
+      canvasRef.current;
+
     if (!canvas) return;
 
-    // handle pointer events (works for mouse + touch)
-    function handlePointerMove(e) {
-      const rect = canvas.getBoundingClientRect();
-      // client coordinates -> CSS pixels relative to top-left of canvas
-      const cssX = e.clientX - rect.left;
-      const cssY = e.clientY - rect.top;
+    const onMove = (e) => {
+      const { inst, x, y } =
+        getHit(
+          e.clientX,
+          e.clientY
+        );
 
-      // clamp inside [0, gridWidth/gridHeight]
-      const x = Math.max(0, Math.min(gridWidth, cssX));
-      const y = Math.max(0, Math.min(gridHeight, cssY));
+      setHoveredInstrument(
+        inst || null
+      );
 
-      setCursor({ inside: true, x: Math.round(x), y: Math.round(y) });
-    }
+      setTooltipPos({ x, y });
 
-    function handlePointerLeave() {
-      setCursor((c) => ({ ...c, inside: false }));
-    }
+      canvas.style.cursor = inst
+        ? "pointer"
+        : "crosshair";
+    };
 
-    canvas.addEventListener("pointermove", handlePointerMove);
-    canvas.addEventListener("pointerleave", handlePointerLeave);
-    canvas.addEventListener("pointercancel", handlePointerLeave);
+    const onLeave = () => {
+      setHoveredInstrument(null);
+
+      canvas.style.cursor =
+        "crosshair";
+    };
+
+    // CLICK NAVIGATION
+    const onClick = (e) => {
+      const { inst } = getHit(
+        e.clientX,
+        e.clientY
+      );
+
+      if (inst?.instrumentId) {
+        window.location.href = `/${inst.instrumentId}/graph`;
+      }
+    };
+
+    canvas.addEventListener(
+      "pointermove",
+      onMove
+    );
+
+    canvas.addEventListener(
+      "pointerleave",
+      onLeave
+    );
+
+    canvas.addEventListener(
+      "click",
+      onClick
+    );
 
     return () => {
-      canvas.removeEventListener("pointermove", handlePointerMove);
-      canvas.removeEventListener("pointerleave", handlePointerLeave);
-      canvas.removeEventListener("pointercancel", handlePointerLeave);
+      canvas.removeEventListener(
+        "pointermove",
+        onMove
+      );
+
+      canvas.removeEventListener(
+        "pointerleave",
+        onLeave
+      );
+
+      canvas.removeEventListener(
+        "click",
+        onClick
+      );
     };
-  }, [gridWidth, gridHeight]);
+  }, [getHit]);
+
+  // tooltip placement
+  const tipLeft =
+    tooltipPos.x + 220 >
+    canvasSize.width
+      ? tooltipPos.x - 215
+      : tooltipPos.x + 16;
+
+  const tipTop =
+    tooltipPos.y + 180 >
+    canvasSize.height
+      ? tooltipPos.y - 170
+      : tooltipPos.y + 16;
 
   return (
-    <div style={{ display: "flex", gap: 16, alignItems: "flex-start" }}>
-      <div style={{ width: gridWidth, height: gridHeight, boxSizing: "border-box" }}>
-        <canvas
-          ref={canvasRef}
-          role="img"
-          aria-label="Panel grid"
-          style={{ display: "block", width: gridWidth, height: gridHeight }}
-        />
-      </div>
-
-      {/* Tool pit on the right */}
-      <div
-        aria-hidden={!cursor.inside}
+    <div
+      ref={containerRef}
+      style={{
+        width: "100%",
+        height: "100%",
+        position: "relative",
+        overflow: "hidden",
+        background: COLOR.bg,
+      }}
+    >
+      <canvas
+        ref={canvasRef}
         style={{
-          width: 220,
-          minHeight: 80,
-          padding: 12,
+          width: "100%",
+          height: "100%",
+          display: "block",
+          cursor: "crosshair",
+        }}
+      />
+
+      {/* LEGEND */}
+      <div
+        style={{
+          position: "absolute",
+          bottom: 10,
+          right: 10,
+
+          background:
+            "rgba(255,255,255,0.9)",
+
+          border:
+            "1px solid #d0daea",
+
           borderRadius: 8,
-          background: "#ffffff",
-          boxShadow: "0 6px 18px rgba(0,0,0,0.06)",
-          fontFamily: "system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue'",
-          fontSize: 13,
-          color: "#111",
-          border: "1px solid #e6edf6",
+
+          padding: "8px 10px",
+
+          fontSize: 11,
+
+          display: "flex",
+
+          flexDirection: "column",
+
+          gap: 6,
+
+          pointerEvents: "none",
         }}
       >
-        <div style={{ fontSize: 14, fontWeight: 600, marginBottom: 8 }}>Cursor</div>
+        <div
+          style={{
+            display: "flex",
+            alignItems: "center",
+            gap: 6,
+          }}
+        >
+          <span
+            style={{
+              width: 14,
+              height: 14,
+              background:
+                "rgba(20,40,90,0.82)",
+              border:
+                "1px solid #1a3c7b",
+              display: "inline-block",
+            }}
+          />
 
-        {cursor.inside ? (
-          <>
-            <div style={{ marginBottom: 6 }}>
-              <div style={{ color: "#555", fontSize: 12 }}>Pixel (x, y)</div>
-              <div style={{ fontWeight: 700, marginTop: 4 }}>{`${cursor.x}, ${cursor.y}`}</div>
-            </div>
-            <div style={{ color: "#666", fontSize: 12, marginTop: 6 }}>
-              Move cursor over the canvas to inspect coordinates. When you leave the canvas the tool hides.
-            </div>
-          </>
-        ) : (
-          <div style={{ color: "#888" }}>Move pointer over the canvas to see coordinates</div>
-        )}
+          <span>Pillar</span>
+        </div>
+
+        <div
+          style={{
+            display: "flex",
+            alignItems: "center",
+            gap: 6,
+          }}
+        >
+          <span
+            style={{
+              width: 14,
+              height: 14,
+              borderRadius: "50%",
+              background: "#1976d2",
+              display: "inline-block",
+            }}
+          />
+
+          <span>
+            Instrument
+          </span>
+        </div>
       </div>
+
+      {/* TOOLTIP */}
+      {hoveredInstrument && (
+        <div
+          style={{
+            position: "absolute",
+
+            left: tipLeft,
+            top: tipTop,
+
+            width: 220,
+
+            background:
+              COLOR.tooltipBg,
+
+            border: `1px solid ${COLOR.tooltipBorder}`,
+
+            borderRadius: 8,
+
+            padding: "10px 12px",
+
+            boxShadow:
+              "0 4px 16px rgba(0,0,0,0.12)",
+
+            pointerEvents: "none",
+
+            zIndex: 1000,
+
+            fontSize: 12,
+          }}
+        >
+          <div
+            style={{
+              fontWeight: 700,
+
+              color:
+                COLOR.tooltipTitle,
+
+              marginBottom: 6,
+
+              fontSize: 13,
+            }}
+          >
+            {
+              hoveredInstrument.instrumentName
+            }
+          </div>
+
+          <div
+            style={{
+              height: 1,
+              background:
+                COLOR.tooltipBorder,
+              marginBottom: 6,
+            }}
+          />
+
+          <div>
+            <b>ID:</b>{" "}
+            {
+              hoveredInstrument.instrumentId
+            }
+          </div>
+
+          <div>
+            <b>Panel:</b>{" "}
+            {
+              hoveredInstrument.panelNumber
+            }
+          </div>
+
+          <div>
+            <b>Range:</b>{" "}
+            {
+              hoveredInstrument.minValue
+            }
+            {" - "}
+            {
+              hoveredInstrument.maxValue
+            }{" "}
+            {
+              hoveredInstrument.unit
+            }
+          </div>
+
+          <div
+            style={{
+              marginTop: 8,
+              color: "#1976d2",
+              fontSize: 11,
+            }}
+          >
+            Click to view graph →
+          </div>
+        </div>
+      )}
     </div>
   );
 };
 
 export default PanelSnapshot;
-
-
-
