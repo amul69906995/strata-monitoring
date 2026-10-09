@@ -63,6 +63,11 @@ Browse all panels, their metadata, and statuses.
 ![Panel List View](./assets/panel_details.png)
 
 ---
+### 6️⃣ Panel View  
+how a panel looks like
+![Panel  View](./assets/pillar.png)
+
+---
 
 ## 🔮 Future Implementation
 
